@@ -2,29 +2,18 @@ import requests
 from bs4 import BeautifulSoup
 from time import sleep
 from random import choice
+from csv import DictReader
 
 all_quotes=[]
 base_url="http://quotes.toscrape.com"
 url="/page/1"
 
-while url:
-	res=requests.get(f"{base_url}{url}")
-	#print(f"Now Scraping {base_url}{url}.....")
-	soup=BeautifulSoup(res.text,"html.parser")
-	quotes=soup.find_all(class_="quote")
-	for quote in quotes:
-		all_quotes.append({
-			"QUOTE":quote.find(class_="text").get_text(),
-			"AUTHOR":quote.find(class_="author").get_text(),
-			"URL":quote.find("a")["href"]
-			})
+with open("web_scraping_project.csv") as csv_file:
+	csv_reader=DictReader(csv_file)
+	for quote in csv_reader:
+		all_quotes.append(quote)
+		#print(all_quotes)
 
-	next_page=soup.find(class_="next")
-	if next_page:
-		url=next_page.find("a")["href"]
-	else:
-		url=None
-	#sleep(2)	
 print("\n")
 game=1
 while game:
@@ -51,7 +40,7 @@ while game:
 			break
 		else:
 			print(f"\nIncorrect guess! Remaining guesses left {guess}\n")
-			sleep(1)
+			#sleep(1)
 			if guess==3:
 				#make request to 
 				res_author=requests.get(f"{base_url}{quote['URL']}")
@@ -79,29 +68,11 @@ while game:
 		print("\nYou won!\n")
 		print("*"*192)
 	user_choice=input("\n\nWould youlike to play again?(y/n)\n")
+	while user_choice.lower() not in ["yes","y","n","no"]:
+		user_choice=input("Would youlike to play again?(y/n)\n")
+
 	if user_choice.lower()=="y" or user_choice.lower()=="yes":
 	 	game=1
 	else:
 		print("OK,GOODBYE!!")
 		game=0
-	
-    
-	
-    
-
-	
-
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
